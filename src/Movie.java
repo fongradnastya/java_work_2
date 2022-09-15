@@ -1,3 +1,4 @@
+
 public class Movie {
     private double averageUserRating;
     private long boxOffice;

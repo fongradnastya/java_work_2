@@ -98,6 +98,7 @@ public class ConsoleInput {
         long number = -1;
         while (number < 0)
         {
+            System.out.print("Please, enter a film box office: ");
             if(scanner.hasNext()){
                 String line = scanner.nextLine();
                 try
@@ -107,7 +108,6 @@ public class ConsoleInput {
                 catch (NumberFormatException e)
                 {
                     System.out.println("Wrong number format!");
-                    return 0;
                 }
                 if(number < 0){
                     System.out.println("This value can't be negative");
@@ -119,7 +119,7 @@ public class ConsoleInput {
 
     public static String inputFilmName(){
         System.out.print("Please, enter film name: ");
-        return scanner.next();
+        return scanner.nextLine();
     }
     public static void close(){
         scanner.close();
