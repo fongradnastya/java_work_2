@@ -36,13 +36,13 @@ public class Main {
                     System.out.println("Successfully added new movie");
                 }
                 case 3 -> changeMovieInformation();
-
                 case 4 -> printMovies();
                 case 5 -> {
                     sortMovies();
                     printMovies();
                 }
-                case 6 -> {
+                case 6 -> deleteMovie();
+                case 7 -> {
                     end = true;
                     ConsoleInput.close();
                 }
@@ -80,7 +80,8 @@ public class Main {
         System.out.println("3 - edite a movie information");
         System.out.println("4 - print a movie list");
         System.out.println("5 - sort movies by a parameter");
-        System.out.println("6 - exit");
+        System.out.println("6 - delete a movie by a number");
+        System.out.println("7 - exit");
         System.out.println("--------------------------------------------------");
     }
 
@@ -173,5 +174,17 @@ public class Main {
         System.out.println("4 - to sort by a box office");
         System.out.println("5 - to sort by a common rating");
         System.out.println("--------------------------------------------------");
+    }
+
+    public static void deleteMovie(){
+        System.out.print("Please enter the number of the movie to be deleted: ");
+        int numberToDelete = ConsoleInput.getPositiveNumber();
+        if(numberToDelete > movieArray.size() || numberToDelete <= 0){
+            System.out.println("There is no movie with that number!");
+        }
+        else {
+            movieArray.remove(numberToDelete - 1);
+            System.out.println("Successfully deleted a movie");
+        }
     }
 }

@@ -1,14 +1,34 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Formatter;
 
 /**
  * Класс Movie реализует хранение информации о фильме и методы её изменения
  */
 public class Movie {
+    /**
+     * Средняя оценка фильма пользователями
+     */
     private double averageUserRating;
+
+    /**
+     * Кассовые сборы фильма
+     */
     private long boxOffice;
+
+    /**
+     * Название фильма
+     */
     private String filmName;
+
+    /**
+     * Жанр фильма
+     */
     private String filmGenre;
+
+    /**
+     * Список допустимых жанров фильма
+     */
     private static ArrayList<String> movieGenres;
 
     /**
@@ -42,23 +62,23 @@ public class Movie {
     }
 
     /**
-     * Получение доступа к статическому полю movieGenres
-     * @return значение movieGenres
+     * Получение доступа к списку возможных жанров фильма
+     * @return movieGenres - жанр фильма
      */
     public static ArrayList<String> getAvailableGenres(){
         return movieGenres;
     }
 
     /**
-     * Получение доступа к полю averageUserRating
-     * @return averageUserRating
+     * Получение доступа к средней оценке пользователей
+     * @return averageUserRating - средняя оценка
      */
     public double getAverageUserRating() {
         return averageUserRating;
     }
 
     /**
-     * Устанавливает значение поля movieGenres
+     * Устанавливает значение средней оценки фильма пользователями
      * @param averageUserRating - средняя оценка фильма пользователями
      */
     public void setAverageUserRating(double averageUserRating) {
@@ -66,15 +86,15 @@ public class Movie {
             this.averageUserRating = averageUserRating;
     }
     /**
-     * Получение доступа к полю boxOffice
-     * @return boxOffice
+     * Получение доступа к кассовым сборам фильма
+     * @return boxOffice - кассовые сборы
      */
     public long getBoxOffice() {
         return boxOffice;
     }
 
     /**
-     * Устанавливает значение поля boxOffice
+     * Устанавливает значение кассовых сборов фильма
      * @param boxOffice - кассовый сбор фильма
      */
     public void setBoxOffice(long boxOffice) {
@@ -85,52 +105,65 @@ public class Movie {
     }
 
     /**
-     * Получение доступа к полю filmName
-     * @return filmName
+     * Получение доступа к названию фильма
+     * @return filmName - название фильма
      */
     public String getFilmName() {
         return filmName;
     }
 
     /**
-     * Устанавливает значение поля filmName
+     * Устанавливает значение для имени фильма
      * @param filmName - название нового фильма
      */
     public void setFilmName(String filmName) {
-        this.filmName = filmName;
+        if(!filmName.isEmpty() && !filmName.equals("")){
+            this.filmName = filmName;
+        }
     }
 
     /**
-     * Получение доступа к полю filmGenre
-     * @return filmGenre
+     * Получение доступа к рейтингу фильма
+     * @return filmGenre - рейтинг фильма
      */
     public String getFilmGenre() {
         return filmGenre;
     }
 
     /**
-     * Устанавливает значение поля currGenre в одно из допустимых значений
+     * Устанавливает значение жанра фильма в одно из допустимых
      * @param currGenre - жанр текущего фильма
      */
     public void setFilmGenre(String currGenre) {
-        if(! movieGenres.isEmpty() && movieGenres.contains(currGenre)){
+        if(!movieGenres.isEmpty() && movieGenres.contains(currGenre)){
             this.filmGenre = currGenre;
-        }
-        else {
-            this.filmGenre = "empty";
         }
     }
 
     /**
-     * вычисляет финальный рейтинг фильма, учитывая оценки пользователей и кассовые сборы
+     * Вычисляет финальный рейтинг фильма, учитывая оценки пользователей и кассовые сборы
      * @return rating - дробное значение в промежутке от 0 до 5
      */
     public double countCommonRating(){
-        long maxBoxOffice = 1_000_000_000L;
-        double cinemaRating = (double) (boxOffice) / (double) maxBoxOffice * 4;
+        final long MAX_VALUE = 1_000_000_000L;
+        final long INCREASE_FACTOR = 4;
+        double cinemaRating = (double) (boxOffice) / (double) MAX_VALUE * INCREASE_FACTOR;
         double rating = averageUserRating + cinemaRating;
-        rating = (double) Math.round(rating * 10) / 10;
         if(rating < 5) return rating;
         return 5.0;
+    }
+
+    /**
+     * Формирует строку с данными о фильме
+     * @return строковое представление фильма
+     */
+    @Override
+    public String toString() {
+        return "Movie{" +
+                "averageUserRating=" + averageUserRating +
+                ", boxOffice=" + boxOffice +
+                ", filmName='" + filmName + '\'' +
+                ", filmGenre='" + filmGenre + '\'' +
+                '}';
     }
 }
