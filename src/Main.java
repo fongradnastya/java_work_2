@@ -1,12 +1,11 @@
 import org.jetbrains.annotations.NotNull;
-
+import java.util.Collections;
 import java.util.ArrayList;
+import java.util.Comparator;
 
 public class Main {
 
-    static String[] movieGenres = {
-        "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
-    };
+
     static ArrayList<Movie> movieArray = new ArrayList<>();
 
     public static void main(String[] args) {
@@ -36,6 +35,11 @@ public class Main {
                     break;
                 }
                 case 4: {
+                    printMovies(movieArray);
+                    break;
+                }
+                case 5: {
+                    sortMovies();
                     printMovies(movieArray);
                     break;
                 }
@@ -116,11 +120,49 @@ public class Main {
         System.out.println("2 - to change a movie genre");
         System.out.println("3 - to change a user rating");
         System.out.println("4 - to change a box office");
-        System.out.println("5 - te exit");
         System.out.println("--------------------------------------------------");
     }
 
     public static void sortMovies(){
-
+        printChangeMenu();
+        int command = 0;
+        command = ConsoleInput.getCommand();
+        switch (command) {
+            case 1: {
+                Collections.sort(movieArray, new Comparator<Movie>() {
+                    public int compare(Movie movie1, Movie movie2) {
+                        return (movie1.getFilmName()).compareTo(movie2.getFilmName());
+                    }
+                });
+                break;
+            }
+            case 2: {
+                Collections.sort(movieArray, new Comparator<Movie>() {
+                    public int compare(Movie movie1, Movie movie2) {
+                        return (movie1.getFilmGenre()).compareTo(movie2.getFilmGenre());
+                    }
+                });
+                break;
+            }
+            case 3: {
+                Collections.sort(movieArray, new Comparator<Movie>() {
+                    public int compare(Movie movie1, Movie movie2) {
+                        return Double.compare(movie1.getAverageUserRating(), movie2.getAverageUserRating());
+                    }
+                });
+                break;
+            }
+            case 4: {
+                Collections.sort(movieArray, new Comparator<Movie>() {
+                    public int compare(Movie movie1, Movie movie2) {
+                        return Long.compare(movie1.getBoxOffice(), movie2.getBoxOffice());
+                    }
+                });
+                break;
+            }
+            default:{
+                System.out.println("Wrong command!");
+            }
+        }
     }
 }

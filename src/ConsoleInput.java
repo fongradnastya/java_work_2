@@ -53,7 +53,8 @@ public class ConsoleInput {
     }
     public static String inputMovieGenre(){
         String[] array = {"Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"};
-        ArrayList<String> movieGenres = new ArrayList<>(Arrays.asList(array));
+        Movie.setAvailableGenres(array);
+        ArrayList<String> movieGenres = Movie.getAvailableGenres();
         System.out.println("Available movie genres:");
         System.out.println(movieGenres);
         String currGenre = "";
