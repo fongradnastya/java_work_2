@@ -1,26 +1,32 @@
-import org.jetbrains.annotations.NotNull;
-import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Comparator;
 
+/**
+ * Класс Main содержит основной функционал консольного приложения
+ */
 public class Main {
-
-
     static ArrayList<Movie> movieArray = new ArrayList<>();
 
+    /**
+     * Содержит основной цикл, является точкой входа в программу
+     * @param args - аргументы, переданные программе при запуске
+     */
     public static void main(String[] args) {
         boolean end = false;
+        String[] array = {
+                "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
+        };
+        Movie.setAvailableGenres(array);
         while (! end) {
             printMenu();
             int command = ConsoleInput.getCommand();
             switch (command) {
-                case 1: {
+                case 1 -> {
                     Movie emptyMovie = new Movie();
                     movieArray.add(emptyMovie);
                     System.out.println("Successfully added new movie");
-                    break;
                 }
-                case 2: {
+                case 2 -> {
                     String name = ConsoleInput.inputFilmName();
                     double userRating = ConsoleInput.inputUserRating();
                     long boxOffice = ConsoleInput.inputBoxOffice();
@@ -28,45 +34,45 @@ public class Main {
                     Movie movie = new Movie(name, userRating, boxOffice, genre);
                     movieArray.add(movie);
                     System.out.println("Successfully added new movie");
-                    break;
                 }
-                case 3: {
-                    changeMovieInformation();
-                    break;
-                }
-                case 4: {
-                    printMovies(movieArray);
-                    break;
-                }
-                case 5: {
+                case 3 -> changeMovieInformation();
+
+                case 4 -> printMovies();
+                case 5 -> {
                     sortMovies();
-                    printMovies(movieArray);
-                    break;
+                    printMovies();
                 }
-                case 6: {
+                case 6 -> {
                     end = true;
                     ConsoleInput.close();
-                    break;
                 }
             }
         }
     }
-    public static void printMovies(@NotNull ArrayList<Movie> movies){
-        if(movies.isEmpty()){
+
+    /**
+     * Выводит в консоль список всех фильмов
+     */
+    public static void printMovies(){
+        if(movieArray.isEmpty()){
             System.out.println("No movies yet");
         }
         else {
             System.out.println("                Movies");
-            for (int i = 0; i < movies.size(); i++) {
+            for (int i = 0; i < movieArray.size(); i++) {
                 System.out.printf("._____________.    Number: %d\n", i + 1);
-                System.out.printf("|^-----------^|    Movie name: %s\n", movies.get(i).getFilmName());
-                System.out.printf("||..0.....0..||    Genre: %s\n", movies.get(i).getFilmGenre());
-                System.out.printf("||..0.....0..||    User rating: %.1f\n", movies.get(i).getAverageUserRating());
-                System.out.printf("|^-----------^|    Box office: %d$\n", movies.get(i).getBoxOffice());
-                System.out.printf("|_____________|    Common rating: %.1f\n\n", movies.get(i).countCommonRating());
+                System.out.printf("|^-----------^|    Movie name: %s\n", movieArray.get(i).getFilmName());
+                System.out.printf("||..0.....0..||    Genre: %s\n", movieArray.get(i).getFilmGenre());
+                System.out.printf("||..0.....0..||    User rating: %.1f\n", movieArray.get(i).getAverageUserRating());
+                System.out.printf("|^-----------^|    Box office: %d$\n", movieArray.get(i).getBoxOffice());
+                System.out.printf("|_____________|    Common rating: %.1f\n\n", movieArray.get(i).countCommonRating());
             }
         }
     }
+
+    /**
+     * Выводит в консоль основное меню пользователя
+     */
     public static void printMenu(){
         System.out.println("----------------------MENU------------------------");
         System.out.println("1 - add an empty movie");
@@ -77,6 +83,10 @@ public class Main {
         System.out.println("6 - exit");
         System.out.println("--------------------------------------------------");
     }
+
+    /**
+     * Меняет одно из свойств фильма на введённое пользователем значение
+     */
     public static void changeMovieInformation(){
         System.out.print("Please enter the number of the movie to be changed: ");
         int movieNumber = ConsoleInput.getPositiveNumber();
@@ -85,35 +95,33 @@ public class Main {
         }
         else {
             printChangeMenu();
-            int command = 0;
+            int command;
             command = ConsoleInput.getCommand();
             switch (command) {
-                case 1: {
+                case 1 -> {
                     String name = ConsoleInput.inputFilmName();
                     movieArray.get(movieNumber - 1).setFilmName(name);
-                    break;
                 }
-                case 2: {
+                case 2 -> {
                     String genre = ConsoleInput.inputMovieGenre();
                     movieArray.get(movieNumber - 1).setFilmGenre(genre);
-                    break;
                 }
-                case 3: {
+                case 3 -> {
                     double rating = ConsoleInput.inputUserRating();
                     movieArray.get(movieNumber - 1).setAverageUserRating(rating);
-                    break;
                 }
-                case 4: {
+                case 4 -> {
                     long boxOffice = ConsoleInput.inputBoxOffice();
                     movieArray.get(movieNumber - 1).setBoxOffice(boxOffice);
-                    break;
                 }
-                default:{
-                    System.out.println("Wrong command!");
-                }
+                default -> System.out.println("Wrong command!");
             }
         }
     }
+
+    /**
+     * Выводит в консоль меню изменения объекта
+     */
     public static void printChangeMenu() {
         System.out.println("----------------------CHANGE----------------------");
         System.out.println("1 - to change a movie name");
@@ -123,46 +131,47 @@ public class Main {
         System.out.println("--------------------------------------------------");
     }
 
+    /**
+     * Сортирует фильмы по выбранному пользователем свойству
+     */
     public static void sortMovies(){
-        printChangeMenu();
-        int command = 0;
-        command = ConsoleInput.getCommand();
+        printSortMenu();
+        int command = ConsoleInput.getCommand();
         switch (command) {
-            case 1: {
-                Collections.sort(movieArray, new Comparator<Movie>() {
-                    public int compare(Movie movie1, Movie movie2) {
-                        return (movie1.getFilmName()).compareTo(movie2.getFilmName());
-                    }
-                });
-                break;
+            case 1 -> {
+                Comparator<Movie> nameComparator = Comparator.comparing(Movie::getFilmName);
+                movieArray.sort(nameComparator);
             }
-            case 2: {
-                Collections.sort(movieArray, new Comparator<Movie>() {
-                    public int compare(Movie movie1, Movie movie2) {
-                        return (movie1.getFilmGenre()).compareTo(movie2.getFilmGenre());
-                    }
-                });
-                break;
+            case 2 -> {
+                Comparator<Movie> genreComparator = Comparator.comparing(Movie::getFilmGenre);
+                movieArray.sort(genreComparator);
             }
-            case 3: {
-                Collections.sort(movieArray, new Comparator<Movie>() {
-                    public int compare(Movie movie1, Movie movie2) {
-                        return Double.compare(movie1.getAverageUserRating(), movie2.getAverageUserRating());
-                    }
-                });
-                break;
+            case 3 -> {
+                Comparator<Movie> userRatingComparator = Comparator.comparing(Movie::getAverageUserRating);
+                movieArray.sort(userRatingComparator);
             }
-            case 4: {
-                Collections.sort(movieArray, new Comparator<Movie>() {
-                    public int compare(Movie movie1, Movie movie2) {
-                        return Long.compare(movie1.getBoxOffice(), movie2.getBoxOffice());
-                    }
-                });
-                break;
+            case 4 -> {
+                Comparator<Movie> boxOfficeComparator = Comparator.comparing(Movie::getBoxOffice);
+                movieArray.sort(boxOfficeComparator);
             }
-            default:{
-                System.out.println("Wrong command!");
+            case 5 -> {
+                Comparator<Movie> commonRatingComparator = Comparator.comparing(Movie::countCommonRating);
+                movieArray.sort(commonRatingComparator);
             }
+            default -> System.out.println("Wrong command!");
         }
+    }
+
+    /**
+     * Выводит в консоль меню сортировки
+     */
+    public static void printSortMenu() {
+        System.out.println("----------------------SORT-----------------------");
+        System.out.println("1 - to sort by a movie name");
+        System.out.println("2 - to sort by a movie genre");
+        System.out.println("3 - to sort by a user rating");
+        System.out.println("4 - to sort by a box office");
+        System.out.println("5 - to sort by a common rating");
+        System.out.println("--------------------------------------------------");
     }
 }
