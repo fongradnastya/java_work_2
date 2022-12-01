@@ -1,7 +1,6 @@
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -81,7 +80,7 @@ public class Main {
     public static void filterByGenre(){
         String genre = ConsoleInput.inputMovieGenre();
         Stream<Movie> movies = movieArray.stream().filter(movie -> movie.getFilmGenre().equals(genre));
-        List<Movie> newList = movies.collect(Collectors.toCollection(ArrayList::new));;
+        List<Movie> newList = movies.collect(Collectors.toCollection(ArrayList::new));
         printMovies(newList);
     }
 
