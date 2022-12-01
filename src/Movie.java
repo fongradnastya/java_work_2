@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
+import java.util.Objects;
 
 /**
  * Класс Movie реализует хранение информации о фильме и методы её изменения
@@ -165,5 +166,19 @@ public class Movie {
                 ", filmName='" + filmName + '\'' +
                 ", filmGenre='" + filmGenre + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Movie movie)) return false;
+        return Double.compare(movie.getAverageUserRating(), getAverageUserRating()) == 0 &&
+                getBoxOffice() == movie.getBoxOffice() && getFilmName().equals(movie.getFilmName()) &&
+                getFilmGenre().equals(movie.getFilmGenre());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAverageUserRating(), getBoxOffice(), getFilmName(), getFilmGenre());
     }
 }

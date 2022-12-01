@@ -1,17 +1,26 @@
-import java.util.ArrayList;
-import java.util.Comparator;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+import java.util.*;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Класс Main содержит основной функционал консольного приложения
  */
 public class Main {
-    static ArrayList<Movie> movieArray = new ArrayList<>();
+    static List<Movie> movieArray = new ArrayList<>();
+
+    private final static PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
     /**
      * Содержит основной цикл, является точкой входа в программу
      * @param args - аргументы, переданные программе при запуске
      */
     public static void main(String[] args) {
+        movieArray.add(new Movie("Titanic", 4.6, 100000000, "Drama"));
+        movieArray.add(new Movie("Polar Express", 3.1, 200000, "Fantasy"));
+        movieArray.add(new Movie("Black Swan", 4.2, 15000000, "Mystery"));
         boolean end = false;
         String[] array = {
                 "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
@@ -24,7 +33,7 @@ public class Main {
                 case 1 -> {
                     Movie emptyMovie = new Movie();
                     movieArray.add(emptyMovie);
-                    System.out.println("Successfully added new movie");
+                    out.println("Successfully added new movie");
                 }
                 case 2 -> {
                     String name = ConsoleInput.inputFilmName();
@@ -33,16 +42,22 @@ public class Main {
                     String genre = ConsoleInput.inputMovieGenre();
                     Movie movie = new Movie(name, userRating, boxOffice, genre);
                     movieArray.add(movie);
-                    System.out.println("Successfully added new movie");
+                    out.println("Successfully added new movie");
                 }
                 case 3 -> changeMovieInformation();
-                case 4 -> printMovies();
+                case 4 -> {
+                    countStatistic();
+                    Stream<Movie> stream = movieArray.stream();
+                    stream.forEach(out::println);
+                }
                 case 5 -> {
                     sortMovies();
-                    printMovies();
+                    printMovies(movieArray);
                 }
                 case 6 -> deleteMovie();
-                case 7 -> {
+                case 7 -> filterByGenre();
+                case 8 -> deleteDuplicates();
+                case 9 -> {
                     end = true;
                     ConsoleInput.close();
                 }
@@ -50,49 +65,82 @@ public class Main {
         }
     }
 
+    public static void deleteDuplicates(){
+        Stream<Movie> stream = movieArray.stream().distinct();
+        int oldLength = movieArray.size();
+        movieArray = stream.collect(Collectors.toCollection(ArrayList::new));
+        long deletedLength = oldLength - movieArray.size();
+        if (deletedLength > 0){
+            out.printf("%d duplicates was successfully deleted\n", deletedLength);
+        }
+        else{
+            out.println("Duplicates were not found");
+        }
+    }
+
+    public static void filterByGenre(){
+        String genre = ConsoleInput.inputMovieGenre();
+        Stream<Movie> movies = movieArray.stream().filter(movie -> movie.getFilmGenre().equals(genre));
+        List<Movie> newList = movies.collect(Collectors.toCollection(ArrayList::new));;
+        printMovies(newList);
+    }
+
+    public static void countStatistic(){
+        DoubleSummaryStatistics iStats = movieArray.stream().mapToDouble(Movie::countCommonRating).summaryStatistics();
+        out.println(iStats.getCount() + " films");
+        out.println("average movie rating = " + iStats.getAverage());
+        out.println("max movie rating = " + iStats.getMax());
+        out.println("min movie rating = "+ iStats.getMin());
+    }
     /**
      * Выводит в консоль список всех фильмов
      */
-    public static void printMovies(){
-        if(movieArray.isEmpty()){
-            System.out.println("No movies yet");
+    public static void printMovies(List<Movie> movies){
+        if(movies.isEmpty()){
+            out.println("No movies yet");
         }
         else {
-            System.out.println("                Movies");
-            for (int i = 0; i < movieArray.size(); i++) {
-                System.out.printf("._____________.    Number: %d\n", i + 1);
-                System.out.printf("|^-----------^|    Movie name: %s\n", movieArray.get(i).getFilmName());
-                System.out.printf("||..0.....0..||    Genre: %s\n", movieArray.get(i).getFilmGenre());
-                System.out.printf("||..0.....0..||    User rating: %.1f\n", movieArray.get(i).getAverageUserRating());
-                System.out.printf("|^-----------^|    Box office: %d$\n", movieArray.get(i).getBoxOffice());
-                System.out.printf("|_____________|    Common rating: %.1f\n\n", movieArray.get(i).countCommonRating());
+            out.println("                Movies");
+            for (int i = 0; i < movies.size(); i++) {
+                out.printf("._____________.    Number: %d\n", i + 1);
+                printMovie(movies.get(i));
             }
         }
+    }
+
+    public static void printMovie(Movie movie){
+        out.printf("|^-----------^|    Movie name: %s\n", movie.getFilmName());
+        out.printf("||..0.....0..||    Genre: %s\n", movie.getFilmGenre());
+        out.printf("||..0.....0..||    User rating: %.1f\n", movie.getAverageUserRating());
+        out.printf("|^-----------^|    Box office: %d$\n", movie.getBoxOffice());
+        out.printf("|_____________|    Common rating: %.1f\n\n", movie.countCommonRating());
     }
 
     /**
      * Выводит в консоль основное меню пользователя
      */
     public static void printMenu(){
-        System.out.println("----------------------MENU------------------------");
-        System.out.println("1 - add an empty movie");
-        System.out.println("2 - add a movie with parameters");
-        System.out.println("3 - edite a movie information");
-        System.out.println("4 - print a movie list");
-        System.out.println("5 - sort movies by a parameter");
-        System.out.println("6 - delete a movie by a number");
-        System.out.println("7 - exit");
-        System.out.println("--------------------------------------------------");
+        out.println("----------------------MENU------------------------");
+        out.println("1 - add an empty movie");
+        out.println("2 - add a movie with parameters");
+        out.println("3 - edite a movie information");
+        out.println("4 - print a movies information");
+        out.println("5 - sort movies by a parameter");
+        out.println("6 - delete a movie by a number");
+        out.println("7 - filter movies by genre");
+        out.println("8 - delete all duplicates");
+        out.println("9 - exit");
+        out.println("--------------------------------------------------");
     }
 
     /**
      * Меняет одно из свойств фильма на введённое пользователем значение
      */
     public static void changeMovieInformation(){
-        System.out.print("Please enter the number of the movie to be changed: ");
+        out.print("Please enter the number of the movie to be changed: ");
         int movieNumber = ConsoleInput.getPositiveNumber();
         if (movieNumber > movieArray.size()){
-            System.out.println("There is no movie with that number!");
+            out.println("There is no movie with that number!");
         }
         else {
             printChangeMenu();
@@ -124,12 +172,12 @@ public class Main {
      * Выводит в консоль меню изменения объекта
      */
     public static void printChangeMenu() {
-        System.out.println("----------------------CHANGE----------------------");
-        System.out.println("1 - to change a movie name");
-        System.out.println("2 - to change a movie genre");
-        System.out.println("3 - to change a user rating");
-        System.out.println("4 - to change a box office");
-        System.out.println("--------------------------------------------------");
+        out.println("----------------------CHANGE----------------------");
+        out.println("1 - to change a movie name");
+        out.println("2 - to change a movie genre");
+        out.println("3 - to change a user rating");
+        out.println("4 - to change a box office");
+        out.println("--------------------------------------------------");
     }
 
     /**
@@ -167,17 +215,17 @@ public class Main {
      * Выводит в консоль меню сортировки
      */
     public static void printSortMenu() {
-        System.out.println("----------------------SORT-----------------------");
-        System.out.println("1 - to sort by a movie name");
-        System.out.println("2 - to sort by a movie genre");
-        System.out.println("3 - to sort by a user rating");
-        System.out.println("4 - to sort by a box office");
-        System.out.println("5 - to sort by a common rating");
-        System.out.println("--------------------------------------------------");
+        out.println("----------------------SORT-----------------------");
+        out.println("1 - to sort by a movie name");
+        out.println("2 - to sort by a movie genre");
+        out.println("3 - to sort by a user rating");
+        out.println("4 - to sort by a box office");
+        out.println("5 - to sort by a common rating");
+        out.println("--------------------------------------------------");
     }
 
     public static void deleteMovie(){
-        System.out.print("Please enter the number of the movie to be deleted: ");
+        out.print("Please enter the number of the movie to be deleted: ");
         int numberToDelete = ConsoleInput.getPositiveNumber();
         if(numberToDelete > movieArray.size() || numberToDelete <= 0){
             System.out.println("There is no movie with that number!");
