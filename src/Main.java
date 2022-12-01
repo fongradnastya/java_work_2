@@ -4,6 +4,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.counting;
+
 /**
  * Класс Main содержит основной функционал консольного приложения
  */
@@ -20,6 +22,7 @@ public class Main {
         movieArray.add(new Movie("Titanic", 4.6, 100000000, "Drama"));
         movieArray.add(new Movie("Polar Express", 3.1, 200000, "Fantasy"));
         movieArray.add(new Movie("Black Swan", 4.2, 15000000, "Mystery"));
+        movieArray.add(new Movie("House of Peculiar Children", 4.2, 15000000, "Mystery"));
         boolean end = false;
         String[] array = {
                 "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
@@ -54,9 +57,13 @@ public class Main {
                     printMovies(movieArray);
                 }
                 case 6 -> deleteMovie();
-                case 7 -> filterByGenre();
-                case 8 -> deleteDuplicates();
-                case 9 -> {
+                case 7 -> groupByGenre();
+                case 8 -> filterByRating();
+                case 9 -> deleteDuplicates();
+                case 10 -> countStatistic();
+                case 11 -> countTotalBoxOffice();
+                case 12 -> findTheHighestRated();
+                case 13 -> {
                     end = true;
                     ConsoleInput.close();
                 }
@@ -77,11 +84,34 @@ public class Main {
         }
     }
 
-    public static void filterByGenre(){
-        String genre = ConsoleInput.inputMovieGenre();
-        Stream<Movie> movies = movieArray.stream().filter(movie -> movie.getFilmGenre().equals(genre));
+    public static void filterByRating(){
+        double rating = ConsoleInput.inputUserRating();
+        Stream<Movie> movies = movieArray.stream().filter(movie -> movie.getAverageUserRating() >= rating);
         List<Movie> newList = movies.collect(Collectors.toCollection(ArrayList::new));
         printMovies(newList);
+    }
+
+    public static void groupByGenre(){
+        Map<String, List<Movie>> movieToGenre = movieArray.stream().collect(Collectors.groupingBy(Movie::getFilmGenre));
+        Map<String, Long> movieToGenreCounts = movieArray.stream().collect(
+                Collectors.groupingBy(Movie::getFilmGenre, counting()));
+        for(String key : movieToGenre.keySet()){
+            out.println("Genre: " + key + ", count: " + movieToGenreCounts.get(key));
+            out.println();
+            for(Movie movie : movieToGenre.get(key)){
+                printMovie(movie);
+            }
+        }
+    }
+    public static void countTotalBoxOffice(){
+        long startValue = 0;
+        long total = movieArray.stream().reduce(startValue, (value, movie) -> value + movie.getBoxOffice(), Long::sum);
+        out.println("Total cinema box office = " + total + "$");
+    }
+
+    public static void findTheHighestRated(){
+        Optional<Movie> largest = movieArray.stream().max(Movie::compareTo);
+        largest.ifPresent(movie -> System.out.println("Top common rating: " + movie));
     }
 
     public static void countStatistic(){
@@ -123,12 +153,16 @@ public class Main {
         out.println("1 - add an empty movie");
         out.println("2 - add a movie with parameters");
         out.println("3 - edite a movie information");
-        out.println("4 - print a movies information");
+        out.println("4 - print a movie list");
         out.println("5 - sort movies by a parameter");
         out.println("6 - delete a movie by a number");
-        out.println("7 - filter movies by genre");
-        out.println("8 - delete all duplicates");
-        out.println("9 - exit");
+        out.println("7 - group movies by genre");
+        out.println("8 - filter movies by user rating");
+        out.println("9 - delete all duplicates");
+        out.println("10 - print movies rating statistic");
+        out.println("11 - count total box office");
+        out.println("12 - find the most rating movie");
+        out.println("13 - exit");
         out.println("--------------------------------------------------");
     }
 

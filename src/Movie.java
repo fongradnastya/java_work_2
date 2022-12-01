@@ -1,3 +1,5 @@
+import org.jetbrains.annotations.NotNull;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Formatter;
@@ -6,7 +8,7 @@ import java.util.Objects;
 /**
  * Класс Movie реализует хранение информации о фильме и методы её изменения
  */
-public class Movie {
+public class Movie implements Comparable{
     /**
      * Средняя оценка фильма пользователями
      */
@@ -180,5 +182,17 @@ public class Movie {
     @Override
     public int hashCode() {
         return Objects.hash(getAverageUserRating(), getBoxOffice(), getFilmName(), getFilmGenre());
+    }
+
+    @Override
+    public int compareTo(@NotNull Object o) {
+        if(o instanceof Movie){
+            Movie movie = (Movie) o;
+            Double res = countCommonRating() - movie.countCommonRating();
+            if(res > 0) return 1;
+            if(res == 0) return 0;
+            return -1;
+        }
+        return 0;
     }
 }
