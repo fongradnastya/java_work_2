@@ -10,8 +10,15 @@ import static java.util.stream.Collectors.counting;
  * Класс Main содержит основной функционал консольного приложения
  */
 public class Main {
-    static List<Movie> movieArray;
 
+    /**
+     * Список всех фильмов
+     */
+    static ArrayList<Movie> movieArray;
+
+    /**
+     * Поток вывода данных в консоль
+     */
     private final static PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
     /**
@@ -24,18 +31,14 @@ public class Main {
                 "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
         };
         Movie.setAvailableGenres(array);
+        movieArray = createMovieList();
         while (! end) {
-            movieArray = createMovieList();
             printMenu();
             int command = ConsoleInput.getCommand();
             switch (command) {
                 case 1 -> addMovie();
                 case 2 -> changeMovieInformation();
-                case 3 -> {
-                    countStatistic();
-                    Stream<Movie> stream = movieArray.stream();
-                    stream.forEach(out::println);
-                }
+                case 3 -> printMovies(movieArray);
                 case 4 -> {
                     sortMovies();
                     printMovies(movieArray);
@@ -135,7 +138,7 @@ public class Main {
             out.println("Genre: " + key + ", count: " + movieToGenreCounts.get(key));
             out.println();
             for(Movie movie : movieToGenre.get(key)){
-                printMovie(movie);
+                out.println(movie);
             }
         }
     }
@@ -175,21 +178,9 @@ public class Main {
         if(movies.isEmpty()){
             out.println("No movies yet");
         }
-        else {
-            out.println("                Movies");
-            for (int i = 0; i < movies.size(); i++) {
-                out.printf("._____________.    Number: %d\n", i + 1);
-                printMovie(movies.get(i));
-            }
-        }
-    }
+        Stream<Movie> stream = movies.stream();
+        stream.forEach(out::println);
 
-    public static void printMovie(Movie movie){
-        out.printf("|^-----------^|    Movie name: %s\n", movie.getFilmName());
-        out.printf("||..0.....0..||    Genre: %s\n", movie.getFilmGenre());
-        out.printf("||..0.....0..||    User rating: %.1f\n", movie.getAverageUserRating());
-        out.printf("|^-----------^|    Box office: %d$\n", movie.getBoxOffice());
-        out.printf("|_____________|    Common rating: %.1f\n\n", movie.countCommonRating());
     }
 
     /**
@@ -265,29 +256,20 @@ public class Main {
     public static void sortMovies(){
         printSortMenu();
         int command = ConsoleInput.getCommand();
+        Comparator<Movie> newComparator = null;
         switch (command) {
-            case 1 -> {
-                Comparator<Movie> nameComparator = Comparator.comparing(Movie::getFilmName);
-                movieArray.sort(nameComparator);
-            }
-            case 2 -> {
-                Comparator<Movie> genreComparator = Comparator.comparing(Movie::getFilmGenre);
-                movieArray.sort(genreComparator);
-            }
-            case 3 -> {
-                Comparator<Movie> userRatingComparator = Comparator.comparing(Movie::getAverageUserRating);
-                movieArray.sort(userRatingComparator);
-            }
-            case 4 -> {
-                Comparator<Movie> boxOfficeComparator = Comparator.comparing(Movie::getBoxOffice);
-                movieArray.sort(boxOfficeComparator);
-            }
-            case 5 -> {
-                Comparator<Movie> commonRatingComparator = Comparator.comparing(Movie::countCommonRating);
-                movieArray.sort(commonRatingComparator);
-            }
+            case 1 -> newComparator = Comparator.comparing(Movie::getFilmName);
+            case 2 -> newComparator = Comparator.comparing(Movie::getFilmGenre);
+            case 3 -> newComparator = Comparator.comparing(Movie::getAverageUserRating);
+            case 4 -> newComparator = Comparator.comparing(Movie::getBoxOffice);
+            case 5 -> newComparator = Comparator.comparing(Movie::countCommonRating);
             default -> System.out.println("Wrong command!");
         }
+        if (newComparator != null){
+            Stream<Movie> sorted = movieArray.stream().sorted(newComparator);
+            movieArray = sorted.collect(Collectors.toCollection(ArrayList::new));
+        }
+
     }
 
     /**
@@ -315,6 +297,7 @@ public class Main {
         else {
             movieArray.remove(numberToDelete - 1);
             System.out.println("Successfully deleted a movie");
+            printMovies(movieArray);
         }
     }
 }

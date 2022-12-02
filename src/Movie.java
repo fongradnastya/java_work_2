@@ -163,10 +163,11 @@ public class Movie implements Comparable{
     @Override
     public String toString() {
         return "Movie{" +
-                "averageUserRating=" + averageUserRating +
-                ", boxOffice=" + boxOffice +
-                ", filmName='" + filmName + '\'' +
+                "filmName='" + filmName + '\'' +
                 ", filmGenre='" + filmGenre + '\'' +
+                ", averageUserRating=" + averageUserRating +
+                ", boxOffice=" + boxOffice + "$" +
+                ", commonRating=" + countCommonRating() +
                 '}';
     }
 
