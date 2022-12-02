@@ -10,7 +10,7 @@ import static java.util.stream.Collectors.counting;
  * Класс Main содержит основной функционал консольного приложения
  */
 public class Main {
-    static List<Movie> movieArray = new ArrayList<>();
+    static List<Movie> movieArray;
 
     private final static PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
@@ -19,58 +19,88 @@ public class Main {
      * @param args - аргументы, переданные программе при запуске
      */
     public static void main(String[] args) {
-        movieArray.add(new Movie("Titanic", 4.6, 100000000, "Drama"));
-        movieArray.add(new Movie("Polar Express", 3.1, 200000, "Fantasy"));
-        movieArray.add(new Movie("Black Swan", 4.2, 15000000, "Mystery"));
-        movieArray.add(new Movie("House of Peculiar Children", 4.2, 15000000, "Mystery"));
         boolean end = false;
         String[] array = {
                 "Action", "Comedy", "Drama", "Fantasy", "Horror", "Mystery", "Romance", "Thriller", "Western"
         };
         Movie.setAvailableGenres(array);
         while (! end) {
+            movieArray = createMovieList();
             printMenu();
             int command = ConsoleInput.getCommand();
             switch (command) {
-                case 1 -> {
-                    Movie emptyMovie = new Movie();
-                    movieArray.add(emptyMovie);
-                    out.println("Successfully added new movie");
-                }
-                case 2 -> {
-                    String name = ConsoleInput.inputFilmName();
-                    double userRating = ConsoleInput.inputUserRating();
-                    long boxOffice = ConsoleInput.inputBoxOffice();
-                    String genre = ConsoleInput.inputMovieGenre();
-                    Movie movie = new Movie(name, userRating, boxOffice, genre);
-                    movieArray.add(movie);
-                    out.println("Successfully added new movie");
-                }
-                case 3 -> changeMovieInformation();
-                case 4 -> {
+                case 1 -> addMovie();
+                case 2 -> changeMovieInformation();
+                case 3 -> {
                     countStatistic();
                     Stream<Movie> stream = movieArray.stream();
                     stream.forEach(out::println);
                 }
-                case 5 -> {
+                case 4 -> {
                     sortMovies();
                     printMovies(movieArray);
                 }
-                case 6 -> deleteMovie();
-                case 7 -> groupByGenre();
-                case 8 -> filterByRating();
-                case 9 -> deleteDuplicates();
-                case 10 -> countStatistic();
-                case 11 -> countTotalBoxOffice();
-                case 12 -> findTheHighestRated();
-                case 13 -> {
+                case 5 -> deleteMovie();
+                case 6 -> groupByGenre();
+                case 7 -> filterByRating();
+                case 8 -> deleteDuplicates();
+                case 9 -> countStatistic();
+                case 10 -> countTotalBoxOffice();
+                case 11 -> findTheHighestRated();
+                case 12 -> {
                     end = true;
                     ConsoleInput.close();
                 }
+                default -> out.println("Wrong command");
             }
         }
     }
 
+    /**
+     * Создаёт список фильмов с начальным набором значений
+     * @return созданный список фильмов
+     */
+    public static ArrayList<Movie> createMovieList(){
+        ArrayList<Movie> newMovies = new ArrayList<>();
+        newMovies.add(new Movie("Titanic", 4.6, 100000000, "Drama"));
+        newMovies.add(new Movie("Polar Express", 3.1, 200000, "Fantasy"));
+        newMovies.add(new Movie("Black Swan", 4.2, 15000000, "Mystery"));
+        newMovies.add(new Movie("House of Peculiar Children", 4.5, 1700000,
+                "Mystery"));
+        newMovies.add(new Movie("Once Upon a Time in Paris", 3.2, 100000,
+                "Comedy"));
+        return newMovies;
+    }
+
+    /**
+     * Добавляет созданный пользователем фильм в общий список
+     */
+    public static void addMovie(){
+        out.println("1 - to add an empty movie");
+        out.println("2 - to add a movie with parameters");
+        int command = ConsoleInput.getCommand();
+        switch (command){
+            case 1 -> {
+                Movie emptyMovie = new Movie();
+                movieArray.add(emptyMovie);
+                out.println("Successfully added new movie");
+            }
+            case 2 -> {
+                String name = ConsoleInput.inputFilmName();
+                double userRating = ConsoleInput.inputUserRating();
+                long boxOffice = ConsoleInput.inputBoxOffice();
+                String genre = ConsoleInput.inputMovieGenre();
+                Movie movie = new Movie(name, userRating, boxOffice, genre);
+                movieArray.add(movie);
+                out.println("Successfully added new movie");
+            }
+            default -> out.println("Wrong command, movie wasn't added");
+        }
+    }
+
+    /**
+     * Удаляет все дубликаты фильмов в списке
+     */
     public static void deleteDuplicates(){
         Stream<Movie> stream = movieArray.stream().distinct();
         int oldLength = movieArray.size();
@@ -84,6 +114,9 @@ public class Main {
         }
     }
 
+    /**
+     * Фильтрует фильмы по заданному значению пользовательского рейтинга
+     */
     public static void filterByRating(){
         double rating = ConsoleInput.inputUserRating();
         Stream<Movie> movies = movieArray.stream().filter(movie -> movie.getAverageUserRating() >= rating);
@@ -91,6 +124,9 @@ public class Main {
         printMovies(newList);
     }
 
+    /**
+     * Выводит сгруппированный по жанрам список фильмов
+     */
     public static void groupByGenre(){
         Map<String, List<Movie>> movieToGenre = movieArray.stream().collect(Collectors.groupingBy(Movie::getFilmGenre));
         Map<String, Long> movieToGenreCounts = movieArray.stream().collect(
@@ -103,17 +139,27 @@ public class Main {
             }
         }
     }
+
+    /**
+     * Вычисляет суммарный кассовый сбор всех фильмов
+     */
     public static void countTotalBoxOffice(){
         long startValue = 0;
         long total = movieArray.stream().reduce(startValue, (value, movie) -> value + movie.getBoxOffice(), Long::sum);
         out.println("Total cinema box office = " + total + "$");
     }
 
+    /**
+     * Выводит в консоль фильм с наибольшим пользовательским рейтингом
+     */
     public static void findTheHighestRated(){
         Optional<Movie> largest = movieArray.stream().max(Movie::compareTo);
-        largest.ifPresent(movie -> System.out.println("Top common rating: " + movie));
+        largest.ifPresent(movie -> System.out.println("Top user rating: " + movie));
     }
 
+    /**
+     * Выводит статистические данные о числе фильмов и об их общем рейтинге
+     */
     public static void countStatistic(){
         DoubleSummaryStatistics iStats = movieArray.stream().mapToDouble(Movie::countCommonRating).summaryStatistics();
         out.println(iStats.getCount() + " films");
@@ -121,6 +167,7 @@ public class Main {
         out.println("max movie rating = " + iStats.getMax());
         out.println("min movie rating = "+ iStats.getMin());
     }
+
     /**
      * Выводит в консоль список всех фильмов
      */
@@ -150,19 +197,18 @@ public class Main {
      */
     public static void printMenu(){
         out.println("----------------------MENU------------------------");
-        out.println("1 - add an empty movie");
-        out.println("2 - add a movie with parameters");
-        out.println("3 - edite a movie information");
-        out.println("4 - print a movie list");
-        out.println("5 - sort movies by a parameter");
-        out.println("6 - delete a movie by a number");
-        out.println("7 - group movies by genre");
-        out.println("8 - filter movies by user rating");
-        out.println("9 - delete all duplicates");
-        out.println("10 - print movies rating statistic");
-        out.println("11 - count total box office");
-        out.println("12 - find the most rating movie");
-        out.println("13 - exit");
+        out.println("1 - add new movie");
+        out.println("2 - edite a movie information");
+        out.println("3 - print a movie list");
+        out.println("4 - sort movies by a parameter");
+        out.println("5 - delete a movie by a number");
+        out.println("6 - group movies by genre");
+        out.println("7 - filter movies by user rating");
+        out.println("8 - delete all duplicates");
+        out.println("9 - print movies rating statistic");
+        out.println("10 - count total box office");
+        out.println("11 - find the most rating movie");
+        out.println("12 - exit");
         out.println("--------------------------------------------------");
     }
 
@@ -257,6 +303,9 @@ public class Main {
         out.println("--------------------------------------------------");
     }
 
+    /**
+     * Удаляет из списка фильм с заданным номером
+     */
     public static void deleteMovie(){
         out.print("Please enter the number of the movie to be deleted: ");
         int numberToDelete = ConsoleInput.getPositiveNumber();

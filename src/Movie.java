@@ -170,6 +170,11 @@ public class Movie implements Comparable{
                 '}';
     }
 
+    /**
+     * Проверяет, являются ли объекты равными друг другу
+     * @param o объект для сравнения
+     * @return результат проверки на равенство
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -179,20 +184,28 @@ public class Movie implements Comparable{
                 getFilmGenre().equals(movie.getFilmGenre());
     }
 
+    /**
+     * Вычисляет хеш код для экземпляра данного класса
+     * @return числовое значение хеша
+     */
     @Override
     public int hashCode() {
         return Objects.hash(getAverageUserRating(), getBoxOffice(), getFilmName(), getFilmGenre());
     }
 
+    /**
+     * Сравнивает 2 фильма между собой по их пользовательскому рейтингу
+     * @param o объект для сравнения
+     * @return результат сравнения
+     */
     @Override
     public int compareTo(@NotNull Object o) {
         if(o instanceof Movie){
             Movie movie = (Movie) o;
-            Double res = countCommonRating() - movie.countCommonRating();
-            if(res > 0) return 1;
-            if(res == 0) return 0;
-            return -1;
+            return Double.compare(getAverageUserRating(), movie.getAverageUserRating());
         }
-        return 0;
+        else{
+            throw new IllegalArgumentException("Impossible to compare objects");
+        }
     }
 }
