@@ -9,7 +9,7 @@ import static java.util.stream.Collectors.counting;
 /**
  * Класс Main содержит основной функционал консольного приложения
  */
-public class Main {
+public class Main implements MenuEnum{
 
     /**
      * Список всех фильмов
@@ -36,21 +36,21 @@ public class Main {
             printMenu();
             int command = ConsoleInput.getCommand();
             switch (command) {
-                case 1 -> addMovie();
-                case 2 -> changeMovieInformation();
-                case 3 -> printMovies(movieArray);
-                case 4 -> {
+                case ADD_MOVIE -> addMovie();
+                case CHANGE_MOVIE -> changeMovieInformation();
+                case PRINT_MOVIES -> printMovies(movieArray);
+                case SORT_MOVIES -> {
                     sortMovies();
                     printMovies(movieArray);
                 }
-                case 5 -> deleteMovie();
-                case 6 -> groupByGenre();
-                case 7 -> filterByRating();
-                case 8 -> deleteDuplicates();
-                case 9 -> countStatistic();
-                case 10 -> countTotalBoxOffice();
-                case 11 -> findTheHighestRated();
-                case 12 -> {
+                case DELETE_MOVIE -> deleteMovie();
+                case GROUP_MOVIES -> groupByGenre();
+                case FILTER_MOVIES -> filterByRating();
+                case DELETE_DUPLICATES -> deleteDuplicates();
+                case GET_STATISTIC -> countStatistic();
+                case TOTAL_BOX_OFFICE -> countTotalBoxOffice();
+                case FIND_TOP -> findTheHighestRated();
+                case EXIT -> {
                     end = true;
                     ConsoleInput.close();
                 }
@@ -83,12 +83,12 @@ public class Main {
         out.println("2 - to add a movie with parameters");
         int command = ConsoleInput.getCommand();
         switch (command){
-            case 1 -> {
+            case ADD_EMPTY -> {
                 Movie emptyMovie = new Movie();
                 movieArray.add(emptyMovie);
                 out.println("Successfully added new movie");
             }
-            case 2 -> {
+            case ADD_WITH_PARAMETERS -> {
                 String name = ConsoleInput.inputFilmName();
                 double userRating = ConsoleInput.inputUserRating();
                 long boxOffice = ConsoleInput.inputBoxOffice();
@@ -217,19 +217,19 @@ public class Main {
             int command;
             command = ConsoleInput.getCommand();
             switch (command) {
-                case 1 -> {
+                case CHANGE_NAME -> {
                     String name = ConsoleInput.inputFilmName();
                     movieArray.get(movieNumber - 1).setFilmName(name);
                 }
-                case 2 -> {
+                case CHANGE_GENRE -> {
                     String genre = ConsoleInput.inputMovieGenre();
                     movieArray.get(movieNumber - 1).setFilmGenre(genre);
                 }
-                case 3 -> {
+                case CHANGE_RATING -> {
                     double rating = ConsoleInput.inputUserRating();
                     movieArray.get(movieNumber - 1).setAverageUserRating(rating);
                 }
-                case 4 -> {
+                case CHANGE_BOX_OFFICE -> {
                     long boxOffice = ConsoleInput.inputBoxOffice();
                     movieArray.get(movieNumber - 1).setBoxOffice(boxOffice);
                 }
@@ -258,11 +258,11 @@ public class Main {
         int command = ConsoleInput.getCommand();
         Comparator<Movie> newComparator = null;
         switch (command) {
-            case 1 -> newComparator = Comparator.comparing(Movie::getFilmName);
-            case 2 -> newComparator = Comparator.comparing(Movie::getFilmGenre);
-            case 3 -> newComparator = Comparator.comparing(Movie::getAverageUserRating);
-            case 4 -> newComparator = Comparator.comparing(Movie::getBoxOffice);
-            case 5 -> newComparator = Comparator.comparing(Movie::countCommonRating);
+            case SORT_BY_NAME -> newComparator = Comparator.comparing(Movie::getFilmName);
+            case SORT_BY_GENRE -> newComparator = Comparator.comparing(Movie::getFilmGenre);
+            case SORT_BY_USER_RATING -> newComparator = Comparator.comparing(Movie::getAverageUserRating);
+            case SORT_BY_BOX_OFFICE -> newComparator = Comparator.comparing(Movie::getBoxOffice);
+            case SORT_BY_COMMON_RATING -> newComparator = Comparator.comparing(Movie::countCommonRating);
             default -> System.out.println("Wrong command!");
         }
         if (newComparator != null){

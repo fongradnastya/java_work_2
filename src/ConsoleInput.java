@@ -33,13 +33,18 @@ public class ConsoleInput {
     }
 
     /**
-     * Метод getCommand считывает комманду из консоли
+     * Считывает комманду из консоли
      * @return - комманда в виде числа типа int
      */
     public static int getCommand(){
         System.out.print("Enter your command: ");
         return ConsoleInput.getIntString();
     }
+
+    /**
+     * Считывает из консоли положительное целое число
+     * @return полученное значение
+     */
     public static int getPositiveNumber(){
         int number = 0;
         while(number < 1){
